@@ -1,5 +1,7 @@
 import React from "react";
 import { HashRouter as Router, Switch, Route } from "react-router-dom";
+import { ThemeProvider } from '@material-ui/core/styles';
+import theme from './theme';
 import Dashboard from "./Components/Dashboard";
 import Login from "./Components/Login";
 import apiService from "./Services/apiService";
@@ -9,8 +11,9 @@ const response_type = "token";
 const redirect_uri = "http://localhost:3000/app";
 
 function App() {
-  return (
+  return (<ThemeProvider theme={theme}>
     <Router>
+      
       <Switch>
         <Route
           path="/login"
@@ -21,7 +24,7 @@ function App() {
         />
         <Route path="/" component={AppWrapper} />
       </Switch>
-    </Router>
+    </Router></ThemeProvider>
   );
 }
 
