@@ -15,7 +15,7 @@ const MyPlaylists = props => {
       setPlaylists(json);
     };
     handleGetData();
-  }, []);
+  }, [token]);
 
   return (
     <Grid container spacing={2}>

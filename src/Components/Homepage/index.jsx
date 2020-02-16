@@ -43,7 +43,7 @@ const Homepage = props => {
       ) : (
         <div className={classes.formArea} elevation={2}>
           <Typography variant="h4">Welcome to Dotify</Typography>
-          <Button onClick={handleLoginClick} fullWidth variant="contained" color="primary" className={classes.submit}>
+          <Button onClick={handleLoginClick} variant="contained" color="primary" className={classes.submit}>
             Sign In With Spotify
           </Button>
         </div>
