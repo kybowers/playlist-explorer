@@ -5,11 +5,12 @@ import PlaylistCard from "../PlaylistCard";
 import apiService from "../../Services/apiService";
 
 const MyPlaylists = props => {
+  const { token } = props;
   const [playlists, setPlaylists] = useState(null);
 
   useEffect(() => {
     const handleGetData = async () => {
-      const response = await apiService.get("https://api.spotify.com/v1/me/playlists");
+      const response = await apiService.get(token, "https://api.spotify.com/v1/me/playlists");
       const json = await response.json();
       setPlaylists(json);
     };
@@ -21,7 +22,7 @@ const MyPlaylists = props => {
       {playlists && playlists.items ? (
         playlists.items.map(item => (
           <Grid item xs={3} key={item.id}>
-            <PlaylistCard playlist={item} />
+            <PlaylistCard playlist={item} token={token}/>
           </Grid>
         ))
       ) : (

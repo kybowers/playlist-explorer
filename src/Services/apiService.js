@@ -1,22 +1,17 @@
-const userAuth = {};
-
 export default {
-  get: url =>
+  get: (token, url) =>
     fetch(url, {
       method: "GET",
       headers: {
-        Authorization: userAuth["access_token"]
+        Authorization: token
       }
     }),
-  post: (url, data) =>
+  post: (token, url, data) =>
     fetch(url, {
       method: "POST",
       body: JSON.stringify(data),
       headers: {
-        Authorization: userAuth["access_token"]
+        Authorization: token
       }
     }),
-  updateAuth: accessToken => {
-    userAuth["access_token"] = "Bearer " + accessToken;
-  }
 };

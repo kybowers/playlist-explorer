@@ -6,6 +6,7 @@ import CardActions from "@material-ui/core/CardActions";
 import clsx from "clsx";
 import Collapse from "@material-ui/core/Collapse";
 import IconButton from "@material-ui/core/IconButton";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { makeStyles } from "@material-ui/core/styles";
 
 import apiService from "../../Services/apiService";
@@ -24,7 +25,7 @@ const useStyles = makeStyles({
 });
 
 const PlaylistCard = props => {
-  const { playlist } = props;
+  const { playlist, token } = props;
   const [playlistData, setPlaylistData] = useState(null);
   const classes = useStyles();
   const [expanded, setExpanded] = React.useState(false);
@@ -35,12 +36,14 @@ const PlaylistCard = props => {
 
   useEffect(() => {
     const handleGetData = async () => {
-      const response = await apiService.get(`https://api.spotify.com/v1/playlists/${playlist.id}`);
+      const response = await apiService.get(token, `https://api.spotify.com/v1/playlists/${playlist.id}`);
       const json = await response.json();
       setPlaylistData(json);
     };
     handleGetData();
-  });
+  }, []);
+
+  console.log(playlistData);
 
   return (
     <Card>
@@ -59,7 +62,7 @@ const PlaylistCard = props => {
           aria-expanded={expanded}
           aria-label="show more"
         >
-          Icon
+          <ExpandMoreIcon />
         </IconButton>
       </CardActions>
       <Collapse in={expanded} timeout="auto" unmountOnExit>
