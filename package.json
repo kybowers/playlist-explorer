@@ -10,8 +10,11 @@
     "productName": "Dotify",
     "copyright": "Copyright © 2019 ${author}",
     "win": {
-      "target": "portable"
+      "target": ["portable"]
     },
+    "portable": {
+      "artifactName": "Dotify.exe"
+  },
     "files": [
       "build/**/*",
       "node_modules/**/*"

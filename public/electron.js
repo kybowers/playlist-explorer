@@ -10,47 +10,48 @@ let mainWindow;
 
 function createWindow() {
   mainWindow = new BrowserWindow({ width: 1280, height: 720, webPreferences: { nodeIntegration: true } });
-  mainWindow.removeMenu();
   mainWindow.loadURL(isDev ? "http://localhost:3000" : `file://${path.join(__dirname, "../build/index.html")}`);
   if (isDev) {
     // Open the DevTools.
     //BrowserWindow.addDevToolsExtension('<location to your react chrome extension>');
     mainWindow.webContents.openDevTools();
+  } else {
+    mainWindow.removeMenu();
   }
   mainWindow.on("closed", () => (mainWindow = null));
 }
 
 function createAuthWindow(requestEvent, arg) {
   const options = {
+    login_domain: "https://accounts.spotify.com/authorize",
     client_id: "dea2db6618114b038ae3fd02284a8bde",
     redirect_uri: "http://localhost:3000/app"
   };
+  const loginHostname = new URL(options.login_domain).hostname;
   const authWindow = new BrowserWindow({
     width: 450,
     height: 900,
     show: false,
     parent: mainWindow,
     modal: true,
-    webPreferences: { nodeIntegration: true }
   });
   const spotifyAuthURL =
-    "https://accounts.spotify.com/authorize?client_id=" +
-    options.client_id +
-    "&redirect_uri=" +
-    options.redirect_uri +
-    "&response_type=token&display=popup";
+    `${options.login_domain}?client_id=${options.client_id}&redirect_uri=${options.redirect_uri}&response_type=token&display=popup`;
   authWindow.loadURL(spotifyAuthURL);
   authWindow.webContents.on("did-finish-load", function() {
     authWindow.show();
   });
-  authWindow.webContents.on("will-redirect", function(event, oldUrl, newUrl) {
-    const raw_code = /access_token=([^&]*)/.exec(oldUrl) || null;
-    const access_token = raw_code && raw_code.length > 1 ? raw_code[1] : null;
-
-    if (access_token) {
-      requestEvent.reply("access-granted", access_token);
+  authWindow.webContents.on("will-redirect", function(event, url) {
+    const newUrlObject = new URL(url)
+    if (newUrlObject.hostname !== loginHostname) {
+      const raw_code = /access_token=([^&]*)/.exec(url) || null;
+      const access_token = raw_code && raw_code.length > 1 ? raw_code[1] : null;
+  
+      if (access_token) {
+        requestEvent.reply("access-granted", access_token);
+      }
+      authWindow.close();
     }
-    authWindow.close();
   });
 }
 
