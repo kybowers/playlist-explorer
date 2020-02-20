@@ -27,6 +27,11 @@ const useStyles = makeStyles({
   }
 });
 
+const getPlaylistImage = playlist => {
+  if (playlist && playlist.images && playlist.images[0] && playlist.images[0].url) return playlist.images[0].url;
+  else return ""; // TODO placeholder image
+};
+
 const PlaylistCard = props => {
   const { playlist, token } = props;
   const [playlistData, setPlaylistData] = useState(null);
@@ -53,7 +58,7 @@ const PlaylistCard = props => {
 
   return (
     <Card>
-      <CardMedia className={classes.media} image={playlist.images[0].url} />
+      <CardMedia className={classes.media} image={getPlaylistImage(playlist)} />
       <CardContent>{playlist.name}</CardContent>
       <CardActions disableSpacing>
         <IconButton onClick={handleExportClick} aria-label="save">
