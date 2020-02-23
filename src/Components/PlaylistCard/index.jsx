@@ -34,7 +34,7 @@ const getPlaylistImage = playlist => {
 };
 
 const PlaylistCard = props => {
-  const { playlist, token } = props;
+  const { playlistId, token } = props;
   const [playlistData, setPlaylistData] = useState(null);
   const classes = useStyles();
   const [expanded, setExpanded] = React.useState(false);
@@ -50,56 +50,56 @@ const PlaylistCard = props => {
 
   useEffect(() => {
     const handleGetData = async () => {
-      const response = await apiService.get(token, `https://api.spotify.com/v1/playlists/${playlist.id}`);
+      const response = await apiService.get(token, `https://api.spotify.com/v1/playlists/${playlistId}`);
       const json = await response.json();
       setPlaylistData(json);
     };
     handleGetData();
-  }, [token, playlist.id]);
-
+  }, [token, playlistId]);
   return (
-    <Card>
-      <CardMedia className={classes.media} image={getPlaylistImage(playlist)} />
-      <CardContent>{playlist.name}</CardContent>
-      <CardActions disableSpacing>
-        <IconButton onClick={handleExportClick} aria-label="save">
-          <SaveAltIcon />
-        </IconButton>
-        <IconButton
-          className={clsx(classes.expand, {
-            [classes.expandOpen]: expanded
-          })}
-          onClick={handleExpandClick}
-          aria-expanded={expanded}
-          aria-label="show more"
-        >
-          <ExpandMoreIcon />
-        </IconButton>
-      </CardActions>
-      <Collapse in={expanded} timeout="auto" unmountOnExit>
-        <CardContent>
-          {playlistData &&
-            playlistData.tracks &&
-            playlistData.tracks.items &&
-            playlistData.tracks.items.map(item => (
-              <div key={item.track.id}>
-                <Typography display="inline">
-                  <b>{item.track.artists[0].name}</b>
-                </Typography>
-                <Typography display="inline">&nbsp;-&nbsp;</Typography>
-                <Typography display="inline">{item.track.name}</Typography>
-              </div>
-            ))}
-        </CardContent>
-      </Collapse>
-      <ExportModal
-        token={token}
-        open={exportOpen}
-        handleClose={handleExportClick}
-        playlistName={playlist.name}
-        playlistData={playlistData}
-      />
-    </Card>
+    playlistData && (
+      <Card>
+        <CardMedia className={classes.media} image={getPlaylistImage(playlistData)} />
+        <CardContent>{playlistData.name}</CardContent>
+        <CardActions disableSpacing>
+          <IconButton onClick={handleExportClick} aria-label="save">
+            <SaveAltIcon />
+          </IconButton>
+          <IconButton
+            className={clsx(classes.expand, {
+              [classes.expandOpen]: expanded
+            })}
+            onClick={handleExpandClick}
+            aria-expanded={expanded}
+            aria-label="show more"
+          >
+            <ExpandMoreIcon />
+          </IconButton>
+        </CardActions>
+        <Collapse in={expanded} timeout="auto" unmountOnExit>
+          <CardContent>
+            {playlistData &&
+              playlistData.tracks &&
+              playlistData.tracks.items &&
+              playlistData.tracks.items.map(item => (
+                <div key={item.track.id}>
+                  <Typography display="inline">
+                    <b>{item.track.artists[0].name}</b>
+                  </Typography>
+                  <Typography display="inline">&nbsp;-&nbsp;</Typography>
+                  <Typography display="inline">{item.track.name}</Typography>
+                </div>
+              ))}
+          </CardContent>
+        </Collapse>
+        <ExportModal
+          token={token}
+          open={exportOpen}
+          handleClose={handleExportClick}
+          playlistData={playlistData}
+        />
+      </Card>
+    )
   );
 };
 

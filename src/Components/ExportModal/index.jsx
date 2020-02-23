@@ -9,8 +9,15 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import { remote } from "electron";
 import fs from "fs";
 
-
 import apiService from "../../Services/apiService";
+
+const zip = (a1, a2) => a1.map((element, index) => ({...element, ...a2[index]}));
+
+const getValuesFromTrack = track => ({
+  name: track.name,
+  popularity: track.popularity,
+  albumName: track.album.name
+})
 
 const convertToCSV = objArray => {
   const array = typeof objArray != "object" ? JSON.parse(objArray) : objArray;
@@ -27,32 +34,69 @@ const convertToCSV = objArray => {
   return str;
 };
 
+const generateQueryPairs = total => {
+  let pairs = [];
+  const limit = 2;
+  let offset = 0;
+  while (total > 0) {
+    if (total > limit) {
+      pairs = [...pairs, [offset, limit]]
+    } else {
+      pairs = [...pairs, [offset, total]]
+    }
+    total -= limit;
+    offset += limit;
+  }
+  return pairs;
+};
+
+const getAllPlaylistTracks = async (token, playlistData) => {
+  // Get all playlist tracks
+  const trackResponses = await Promise.all(
+    generateQueryPairs(playlistData.tracks.total).map(([offset, limit]) =>
+      apiService.get(
+        token,
+        `https://api.spotify.com/v1/playlists/${playlistData.id}/tracks?offset=${offset}&limit=${limit}`
+      )
+    )
+  );
+  const trackLists = await Promise.all(trackResponses.map(trackResponse => trackResponse.json()));
+  const tracks = trackLists.reduce((accumulator, current) => [...accumulator, ...current.items], []);
+
+  // Get features for all tracks
+  const featuresResponse = await Promise.all(
+    tracks.map(item => apiService.get(token, `https://api.spotify.com/v1/audio-features/${item.track.id}`))
+  );
+  const features =await Promise.all(featuresResponse.map(response => response.json()));
+  return zip(tracks.map(track => (getValuesFromTrack({...track.track}))), features);
+};
+
 const ExportContent = props => {
-  const { token, handleClose, playlistName, playlistData } = props;
+  const { token, handleClose, playlistData } = props;
   const [working, setWorking] = useState(false);
 
   const handleExport = async () => {
     setWorking(true);
-    if (!playlistData || !playlistData.tracks || !playlistData.tracks.items) {
+    if (!playlistData || !playlistData.tracks) {
       // TODO fail handle
       handleClose();
     }
-    const featuresResponse = await Promise.all(
-      playlistData.tracks.items.map(item =>
-        apiService.get(token, `https://api.spotify.com/v1/audio-features/${item.track.id}`)
-      )
-    );
-    const featuresList = await Promise.all(featuresResponse.map(response => response.json()));
-    const csvBody = convertToCSV(featuresList);
-    const filePathResponse = await remote.dialog.showSaveDialog(null, {
-      defaultPath: playlistName,
-      filters: [{ name: "CSV (.csv)", extensions: ["csv"] }]
-    });
+
+    // Get audio features, and give user save dialog
+    const [trackFeatures, filePathResponse] = await Promise.all([
+      getAllPlaylistTracks(token, playlistData),
+      remote.dialog.showSaveDialog(null, {
+        defaultPath: playlistData.name,
+        filters: [{ name: "CSV (.csv)", extensions: ["csv"] }]
+      })
+    ]);
+    // Build and export CSV
+    const csvBody = convertToCSV(trackFeatures);
     if (!filePathResponse.canceled) {
       fs.writeFile(filePathResponse.filePath, csvBody, err => {
         if (err) throw err;
-        console.log("Saved!");
       });
+      console.log("Saved!");
       handleClose();
     } else {
       setWorking(false);
@@ -65,24 +109,10 @@ const ExportContent = props => {
       <DialogContent>
         {working ? (
           <LinearProgress />
-        ) : playlistData ? (
-          <>
-            <DialogContentText>
-              You are about to export the audio features for <b>{playlistName}</b> to a csv file.
-            </DialogContentText>
-            {/* <TextField
-              label="File Name"
-              id="export-file-name"
-              value={fileName}
-              onChange={event => setFileName(event.target.value)}
-              fullWidth
-              InputProps={{
-                endAdornment: <InputAdornment position="end">.csv</InputAdornment>
-              }}
-            /> */}
-          </>
         ) : (
-          <DialogContentText>Something went wrong, we couldn't find that playlist</DialogContentText>
+          <DialogContentText>
+            You are about to export the audio features for <b>{playlistData.name}</b> to a csv file.
+          </DialogContentText>
         )}
       </DialogContent>
       <DialogActions>

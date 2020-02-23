@@ -7,7 +7,7 @@ import apiService from "../../Services/apiService";
 
 const MyPlaylists = props => {
   const { token } = props;
-  const [playlists, setPlaylists] = useState([]);
+  const [playlistIds, setPlaylistIds] = useState([]);
   const [total, setTotal] = useState(null);
   const [scrollPosition, setScrollPosition] = useState(0);
 
@@ -19,7 +19,7 @@ const MyPlaylists = props => {
       );
       const json = await response.json();
       setTotal(json.total);
-      setPlaylists(playlists => [...playlists, ...json.items]);
+      setPlaylistIds(playlistIds => [...playlistIds, ...json.items.map(item => item.id)]);
     };
     handleGetData();
   }, [token, scrollPosition]);
@@ -27,13 +27,13 @@ const MyPlaylists = props => {
   return (
     <>
       <Grid container spacing={2}>
-        {playlists.map(item => (
-          <Grid item xs={12} sm={6} md={3} key={item.id}>
-            <PlaylistCard playlist={item} token={token} />
+        {playlistIds.map(id => (
+          <Grid item xs={12} sm={6} md={3} key={id}>
+            <PlaylistCard playlistId={id} token={token} />
           </Grid>
         ))}
       </Grid>
-      {total && total > playlists.length && (
+      {total && total > playlistIds.length && (
         // TODO trigger load more on scroll, no button necessary
         <Button onClick={() => setScrollPosition(scrollPosition => scrollPosition + 20)}>Load More</Button>
       )}
