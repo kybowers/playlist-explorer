@@ -1,19 +1,19 @@
 {
-  "name": "dotify",
-  "version": "0.2.0",
+  "name": "playlist-explorer",
+  "version": "0.2.1",
   "private": true,
   "author": {
     "name": "Kyle Bowers"
   },
   "build": {
-    "appId": "com.yak.dotify",
-    "productName": "Dotify",
+    "appId": "com.yak.plexor",
+    "productName": "Playlist Explorer",
     "copyright": "Copyright © 2019 ${author}",
     "win": {
       "target": ["portable"]
     },
     "portable": {
-      "artifactName": "Dotify.exe"
+      "artifactName": "Plexor.exe"
   },
     "files": [
       "build/**/*",

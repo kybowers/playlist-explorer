@@ -24,7 +24,7 @@ function createWindow() {
 function createAuthWindow(requestEvent, arg) {
   const options = {
     login_domain: "https://accounts.spotify.com/authorize",
-    client_id: "dea2db6618114b038ae3fd02284a8bde",
+    client_id: "a8ff7a9a03ef4c4fad295f9c4344f408",
     redirect_uri: "http://localhost:3000/app"
   };
   const loginHostname = new URL(options.login_domain).hostname;

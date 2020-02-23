@@ -2,25 +2,26 @@ import React, { useState } from "react";
 import { ipcRenderer } from "electron";
 import Button from "@material-ui/core/Button";
 import Container from "@material-ui/core/Container";
+import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 
 import MyPlaylists from "../MyPlaylists";
 
 const useStyles = makeStyles(theme => ({
-  formArea: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    padding: 10,
-    marginTop: 50
+  root: {
+    display: 'flex',
+    justifyContent: 'center',
   },
-  form: {
-    marginTop: 20,
-    marginBottom: 20
+  paper: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    padding: 48,
+    marginTop: 40
   },
   submit: {
-    marginTop: 20
+    marginTop: 48 
   }
 }));
 
@@ -37,16 +38,17 @@ const Homepage = props => {
   };
 
   return (
-    <Container component="main">
+    <Container component="main" className={classes.root}>
       {token ? (
         <MyPlaylists token={token} />
       ) : (
-        <div className={classes.formArea} elevation={2}>
-          <Typography variant="h4">Welcome to Dotify</Typography>
+        <Paper className={classes.paper}>
+          <Typography variant="h4">Welcome to the playlist explorer tool for Spotify</Typography>
+          <Typography variant="body1">Sign in to Spotify to view your playlists</Typography>
           <Button onClick={handleLoginClick} variant="contained" color="primary" className={classes.submit}>
             Sign In With Spotify
           </Button>
-        </div>
+        </Paper>
       )}
     </Container>
   );
