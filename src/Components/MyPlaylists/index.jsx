@@ -15,7 +15,7 @@ const MyPlaylists = props => {
     const handleGetData = async () => {
       const response = await apiService.get(
         token,
-        `https://api.spotify.com/v1/me/playlists?offset=${scrollPosition}&limit=1`
+        `https://api.spotify.com/v1/me/playlists?offset=${scrollPosition}`
       );
       const json = await response.json();
       setTotal(json.total);
@@ -35,7 +35,7 @@ const MyPlaylists = props => {
       </Grid>
       {total && total > playlists.length && (
         // TODO trigger load more on scroll, no button necessary
-        <Button onClick={() => setScrollPosition(scrollPosition => scrollPosition + 1)}>Load More</Button>
+        <Button onClick={() => setScrollPosition(scrollPosition => scrollPosition + 20)}>Load More</Button>
       )}
     </>
   );

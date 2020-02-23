@@ -10,6 +10,7 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import SaveAltIcon from "@material-ui/icons/SaveAlt";
 import { makeStyles } from "@material-ui/core/styles";
 
+import placeholder from "./8note.svg";
 import apiService from "../../Services/apiService";
 import { Typography } from "@material-ui/core";
 import ExportModal from "../ExportModal";
@@ -29,7 +30,7 @@ const useStyles = makeStyles({
 
 const getPlaylistImage = playlist => {
   if (playlist && playlist.images && playlist.images[0] && playlist.images[0].url) return playlist.images[0].url;
-  else return ""; // TODO placeholder image
+  else return placeholder;
 };
 
 const PlaylistCard = props => {
