@@ -13,16 +13,17 @@ const MyPlaylists = props => {
 
   useEffect(() => {
     const handleGetData = async () => {
-      const response = await apiService.get(
-        token,
-        `https://api.spotify.com/v1/me/playlists?offset=${scrollPosition}`
-      );
+      const response = await apiService.get(token, `https://api.spotify.com/v1/me/playlists?offset=${scrollPosition}`);
       const json = await response.json();
       setTotal(json.total);
       setPlaylistIds(playlistIds => [...playlistIds, ...json.items.map(item => item.id)]);
     };
     handleGetData();
   }, [token, scrollPosition]);
+
+  const throwError = () => {
+    throw new Error("This was a test");
+  };
 
   return (
     <>
@@ -37,6 +38,7 @@ const MyPlaylists = props => {
         // TODO trigger load more on scroll, no button necessary
         <Button onClick={() => setScrollPosition(scrollPosition => scrollPosition + 20)}>Load More</Button>
       )}
+      <Button onClick={throwError}>Break Something</Button>
     </>
   );
 };
